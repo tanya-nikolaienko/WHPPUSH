@@ -33,7 +33,7 @@ public class TestWHPPUSH extends TestConfig {
          public String DeleteClientBlockXMLBody="<pk sid=\""+Sid+"\">" +
             "<mes t='DeleteClientBlock' event=\""+Event_VBR+"\" addrid=\""+AdrId+"\" addrtype=\""+AddrTypeCi+"\" extref=\"\"/>\n" +  "</pk>";
 
-    public String AddEventJsonBody="{\n" +
+         public String AddEventJsonBody="{\n" +
             "\"evt\":\""+Event_VBR+"\",\n" +
             "\"st\":\"WT\",\n" +
             "\"addrid\":\"42933175\",\n" +
@@ -42,6 +42,14 @@ public class TestWHPPUSH extends TestConfig {
             "\"lg\":\"dn301182nti\",\n" +
             "\"lang\":\"UA\"\n" +
             "}";
+/*
+         public String WHPpushBodyVBR ="{\n" +
+                 "\"status\":\"delivered\",\n" +
+                 "\"channel\":\"viber\",\n" +
+                 "\"timestamp\":\""+Timestamp1+"\",\n" +
+                 "\"order_id\":\""+ref1+"\",\n" +
+                 "}";
+*/
     /*
     public String WhppushVBRbody="{\n" +
             "\"status\":\"delivered\",\n" +
@@ -58,8 +66,8 @@ public class TestWHPPUSH extends TestConfig {
     public void DeleteClientBlock(){
         System.out.println("-----DeleteClientBlock-------");
         given().body(DeleteClientBlockXMLBody).log().uri().
-                when().post(Base_URL).
-                then().spec(responseSpecification).log().all();
+        when().post(Base_URL).
+        then().spec(responseSpecification).log().body();
         System.out.println();
     }
 
@@ -74,31 +82,32 @@ public class TestWHPPUSH extends TestConfig {
 */
     @Test
     public void FindRef(){
-        System.out.println("-----FindRef-------");
+        System.out.println("-----FindRef-------"); ///AddEvent +  извлекаю переменную реф из ответа для передачи дальше
         Response response =
         given().spec(requestSpecificationAdd).body(AddEventJsonBody).log().body().
-                when().post(AddEvent_ADD).
-                then().extract().response();//spec(responseSpecification).log().body() ;
-        //String ref = String.valueOf(response.getBody());
+        when().post().
+        then().extract().response();
 
         String responseBody  = response.asString();
         JsonPath jsonPath = new JsonPath(responseBody);
 
         ref = jsonPath.getString("ref");
-       // System.out.println("ref->"+ref);
         ref1=ref;
+        stateS = jsonPath.getString("st");
         System.out.println("ref1->"+ref1);
+        System.out.println("state->"+stateS);
         System.out.println();
     }
 
+
+
     @Test
-    public void ModifyState(){
+    public void ModifyState(){ // через запрос к БД меняю статус рефа с WT на IN
         System.out.println("-----ModifyState-------");
             try(Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
             Statement stmt = conn.createStatement();
         )
         {
-            //System.out.println("ref1->"+ref1);
             String QUERY = "SELECT State FROM JEvent WHERE JE_REF='"+ref1+"'";
             String UpdInitialState = "UPDATE JEvent " + "SET State = 'IN' WHERE JE_REF='"+ref1+"'";
             stmt.executeUpdate(UpdInitialState);
@@ -114,11 +123,10 @@ public class TestWHPPUSH extends TestConfig {
     }
 
     @Test
-    public void N_DateTime() {
+    public void N_DateTime() {  // метод для получения Timestamp, его извлечения из ответа и передачи дальше
         System.out.println("-----N_DateTime-------");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         java.util.Date date = new Date(System.currentTimeMillis());
-        //System.out.println("variant1: " + formatter.format(date));
 
         String Timestamp = formatter.format(date);
         System.out.println(Timestamp);
@@ -127,10 +135,9 @@ public class TestWHPPUSH extends TestConfig {
     }
 
     @Test
-    public void WhppushVBR(){
+    public void WhppushVBR(){ // отправка первого коллбека
         System.out.println("----WhppushVBR----");
-        //String someRandomString = String.format("%1$TH%1$TM%1$TS", new Date());
-        System.out.println(Timestamp1);
+       // System.out.println(Timestamp1);
         JSONObject requestBody = new JSONObject();
         requestBody.put("status",status);
         requestBody.put("channel",Ch_VBR);
@@ -140,21 +147,17 @@ public class TestWHPPUSH extends TestConfig {
         RequestSpecification request = RestAssured.given().log().uri();
         request.header("Content-Type", "application/json");
         request.body(requestBody.toString()).log().body();
-        Response response = (Response) request.post(WhpPUSH_URL+WhpPUSH_PATH);//.then().assertThat().body(equalTo("ok"));
 
-        //int statusCode = response.getStatusCode();
-        //Assert.assertEquals(statusCode, 200);
-        //String successCode = response.jsonPath().get("Ok");
-        //Assert.assertEquals(successCode, "ok");
+
+        Response response =request.post(WhpPUSH_URL+WhpPUSH_PATH);
+
         System.out.println(response.getBody().asString());
-        //System.out.println(response.asString());
-        //Assert.assertEquals(statusCode, 200);
-        //System.out.println("The status code recieved: " + statusCode);
+
         System.out.println();
     }
 
     @Test
-    public void X_WhppushVBR(){
+    public void X_WhppushVBR(){ // отправка второго  коллбека
         System.out.println("----WhppushVBR----");
 
         System.out.println(Timestamp1);
@@ -167,24 +170,23 @@ public class TestWHPPUSH extends TestConfig {
         RequestSpecification request = RestAssured.given().log().uri();
         request.header("Content-Type", "application/json");
         request.body(requestBody.toString()).log().body();
-        Response response = request.post(WhpPUSH_URL+WhpPUSH_PATH+"?"+ref1+"&prior="+priority);//.then().assertThat().body(equalTo("ok"));
+       // Response response = request.post(WhpPUSH_URL+WhpPUSH_PATH+"?"+ref1+"&prior="+priority);//.then().assertThat().body(equalTo("ok"));
+        Response response = request.post(WhpPUSH_URL+WhpPUSH_PATH);//.then().assertThat().body(equalTo("ok"));
 
         System.out.println(response.getBody().asString());
         System.out.println();
     }
 
     @Test
-    public void YSelectState(){
+    public void Y_SelectState(){  /// проверка статуса рефа после коллбеков
         System.out.println("-----SelectState-------");
         try(Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
             Statement stmt = conn.createStatement();
         )
         {
 
-            //System.out.println("ref1->"+ref1);
             String QUERY = "SELECT State FROM JEvent WHERE JE_REF='"+ref1+"'";
-            //String UpdInitialState = "UPDATE JEvent " + "SET State = 'IN' WHERE JE_REF='"+ref1+"'";
-            //stmt.executeUpdate(UpdInitialState);
+
             ResultSet rs = stmt.executeQuery(QUERY); // Extract data from result set
             while (rs.next()){   // Retrieve by column name
                 System.out.print("State: " + rs.getString("State"));

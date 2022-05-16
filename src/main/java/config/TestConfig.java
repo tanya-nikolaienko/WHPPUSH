@@ -20,7 +20,7 @@ public class TestConfig {
 
     protected RequestSpecification requestSpecificationAdd = new RequestSpecBuilder()
             .addHeader("sid",Sid)
-            .setBaseUri(Base_URL+AddEvent_PATH)
+            .setBaseUri(Base_URL+AddEvent_PATH+AddEvent_ADD)
             .build();
 
     protected RequestSpecification requestSpecificationModify = new RequestSpecBuilder()

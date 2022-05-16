@@ -4,7 +4,7 @@ public class Constants {
 
     public static class Variables{
 
-        public static String Sid="220516pbs1juwevd2mjd";
+        public static String Sid="220516pbs1luslow2r50";
         public static String AdrId="42933175";
         public static String AddrTypeCi="CI";
         public static String ExtAddrId="1000095894";
@@ -28,7 +28,7 @@ public class Constants {
         public static String ref1;
         public static String Timestamp;
         public static String Timestamp1;
-        public static String responseBody;
+        public static String stateS;
 
         public static String server = Servers.Base_URL;
         public static String path = Path.AddEvent_PATH;
