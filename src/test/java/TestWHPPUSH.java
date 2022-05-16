@@ -42,24 +42,7 @@ public class TestWHPPUSH extends TestConfig {
             "\"lg\":\"dn301182nti\",\n" +
             "\"lang\":\"UA\"\n" +
             "}";
-/*
-         public String WHPpushBodyVBR ="{\n" +
-                 "\"status\":\"delivered\",\n" +
-                 "\"channel\":\"viber\",\n" +
-                 "\"timestamp\":\""+Timestamp1+"\",\n" +
-                 "\"order_id\":\""+ref1+"\",\n" +
-                 "}";
-*/
-    /*
-    public String WhppushVBRbody="{\n" +
-            "\"status\":\"delivered\",\n" +
-            "\"channel\":\"viber\",\n" +
-            "\"timestamp\":\"15-06-2022 21:16:47\",\n" +
-            "\"order_id\":\""+ref1+"\"\n" +
-            "}";
-*/
-    //public static String ModifyEventJsonBody = "{\"ref\": \""+ref1+"\",\n" +
-     //       "\"st\": \"IN\"}";
+
 
 
     @Test
@@ -71,15 +54,7 @@ public class TestWHPPUSH extends TestConfig {
         System.out.println();
     }
 
-/*
-    @Test
-    public void AddEvent(){
-        //given().body(AddEventJsonBody).log().all().header("sid",Sid).//логируем наш запрос
-        given().spec(requestSpecificationAdd).body(AddEventJsonBody).log().all().//header("sid",Sid).//логируем наш запрос
-        when().post(AddEvent_ADD).
-        then().spec(responseSpecification).log().body() ;
-    }
-*/
+
     @Test
     public void FindRef(){
         System.out.println("-----FindRef-------"); ///AddEvent +  извлекаю переменную реф из ответа для передачи дальше
@@ -150,9 +125,7 @@ public class TestWHPPUSH extends TestConfig {
 
 
         Response response =request.post(WhpPUSH_URL+WhpPUSH_PATH);
-
         System.out.println(response.getBody().asString());
-
         System.out.println();
     }
 
@@ -202,41 +175,7 @@ public class TestWHPPUSH extends TestConfig {
 
 
 
-/*
 
-    @Test
-    public void WhppushVBRsmscallback(){
-        System.out.println("ref1->"+ref1);
-        Response response =
-                given().spec(requestSpecificationWhppushVBR).body(WhppushVBRbody).log().body().
-                when().post().
-                then().extract().response();
-                //then().log().body();//then().extract().response();//spec(responseSpecification).log().body() ;
-    }
-
-
-
-    @Test(dependsOnMethods ={"FindRef"})
-    public void ModifyEvent(){
-
-            String ModifyEventJsonBody = "{\"ref\": \""+ref1+"\",\n" +
-                "\"st\": \""+InitialState+"\",\n" +
-                "\"ignoreStFinite\": \"Y"\"n};
-
-        String ModifyEventJsonBody ="{\n" +
-                "\"ref\":\""+ref1+"\",\n" +
-                "\"st\":\""+InitialState+"\",\n" +
-                "\"ignoreStFinite\":\"Y\"\n" +
-                "}";
-
-
-        //System.out.println("ref1 after->"+ref1);
-        given().spec(requestSpecificationModify).body(ModifyEventJsonBody).log().body().
-        when().post(ModifyEvent).
-        then().spec(responseSpecification).log().all();
-
-    }
-*/
 }
 
 
